@@ -42,7 +42,9 @@ namespace SchallyLilyTicketingSystem
                 // Print from fullCsv array
                 for (int j = 0; j < fullCsv[0].Length; j++) {
                     for (int i = 0; i < fullCsv.Length; i++) {
-                        Console.Write($"{fullCsv[i][j],-21}");
+                        String toPrint = fullCsv[i][j].Replace("|", ", ");
+                        Console.Write($"{toPrint,-21}");
+                        // todo: replace -21 with max charlength of row
                     }
                     Console.Write("\n");
                 }

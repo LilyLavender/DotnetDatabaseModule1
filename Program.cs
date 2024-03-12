@@ -46,7 +46,6 @@ namespace SchallyLilyTicketingSystem
                     }
                     Console.Write("\n");
                 }
-                
             } else {
                 Console.WriteLine("Tickets.csv does not exist!");
             }
@@ -68,17 +67,32 @@ namespace SchallyLilyTicketingSystem
                 
                 // Print question for user
                 string[] fullFile = File.ReadAllLines(file);
-                for (int i = 0; i < headers.Length; i++) {
+                fullFile[0] += "," + GenerateNewID(file);
+                for (int i = 1; i < headers.Length; i++) {
                     fullFile[i] += $",{GetString($"Enter your \"{headers[i]}\" value > ", $"\"{headers[i]}\" value cannot be blank")}";
                 }
                 // Add to csv
                 File.WriteAllLines(file, fullFile);
 
                 Console.WriteLine("Entry added to Tickets.csv\n");
-                
             } else {
                 Console.WriteLine("Tickets.csv does not exist!");
             }
+        }
+
+        static int GenerateNewID(string filePath)
+        {
+            string line = File.ReadAllLines(filePath).First();
+            int maxId = 0;
+
+            string[] parts = line.Split(',');
+            foreach (string part in parts) {
+                if (int.TryParse(part, out int id)) {
+                    maxId = Math.Max(maxId, id);
+                }
+            }
+
+            return maxId + 1;
         }
 
         static int GetInt(bool restrictValues, int intMin, int intMax, string prompt, string errorMsg) {

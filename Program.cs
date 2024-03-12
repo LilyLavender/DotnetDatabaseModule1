@@ -6,6 +6,13 @@ namespace SchallyLilyTicketingSystem
     {
         static void Main(string[] args)
         {
+            string filePath = "Tickets.csv";
+            TicketFile ticketFile = new TicketFile(filePath);
+            if (!System.IO.File.Exists(filePath)) {
+                Console.WriteLine("Tickets.csv does not exist, please add a valid Tickets.csv first");
+                Environment.Exit(1);
+            }
+
             while (true) {
                 Console.WriteLine("Type 1 to view csv");
                 Console.WriteLine("Type 2 to add to csv");
@@ -13,10 +20,10 @@ namespace SchallyLilyTicketingSystem
                 int option = GetInt(true, 0, 2, "", "Number must be one of the aforementioned values");
                 switch(option) {
                     case 1:
-                        ViewCsv();
+                        ViewCsv(filePath, ticketFile);
                         break;
                     case 2:
-                        AddToCsv();
+                        AddToCsv(filePath, ticketFile);
                         break;
                     default:
                         Environment.Exit(1);
@@ -25,41 +32,26 @@ namespace SchallyLilyTicketingSystem
             }
         }
 
-        static void ViewCsv() {
-            string file = "Tickets.csv";
-            if (System.IO.File.Exists(file))
-            {
-                // Add data to fullCsv array
-                StreamReader sr = new StreamReader(file);
-                String[][] fullCsv = new String[File.ReadLines(file).Count()][];
-                for (int i = 0; i < fullCsv.Length; i++)
-                {
-                    string? line = sr.ReadLine();
-                    fullCsv[i] = line.Split(',');
-                }
-                sr.Close();
-
-                // Print from fullCsv array
-                for (int j = 0; j < fullCsv[0].Length; j++) {
-                    for (int i = 0; i < fullCsv.Length; i++) {
-                        String toPrint = fullCsv[i][j].Replace("|", ", ");
-                        Console.Write($"{toPrint,-21}");
-                        // todo: replace -21 with max charlength of row
-                    }
-                    Console.Write("\n");
-                }
-            } else {
-                Console.WriteLine("Tickets.csv does not exist!");
+        static void ViewCsv(string filePath, TicketFile ticketFile) {
+            // Print Headers
+            String[] headers = new String[7]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching"};
+            foreach(String h in headers) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            // Print data
+            foreach(Ticket t in ticketFile.Tickets) {
+                Console.WriteLine(t.Display());
             }
         }
 
-        static void AddToCsv() {
-            string file = "Tickets.csv";
-            if (System.IO.File.Exists(file))
+        static void AddToCsv(string filePath, TicketFile ticketFile) {
+            /*
+            if (System.IO.File.Exists(filePath))
             {
                 // Add line header (id, summary, status, etc) to headers array
-                StreamReader sr = new StreamReader(file);
-                String[] headers = new String[File.ReadLines(file).Count()];
+                StreamReader sr = new StreamReader(filePath);
+                String[] headers = new String[File.ReadLines(filePath).Count()];
                 for (int i = 0; i < headers.Length; i++)
                 {
                     string? line = sr.ReadLine();
@@ -68,18 +60,19 @@ namespace SchallyLilyTicketingSystem
                 sr.Close();
                 
                 // Print question for user
-                string[] fullFile = File.ReadAllLines(file);
-                //fullFile[0] += "," + GenerateNewID(file);
+                string[] fullFile = File.ReadAllLines(filePath);
+                //fullFile[0] += "," + GenerateNewID(filePath);
                 for (int i = 1; i < headers.Length; i++) {
                     fullFile[i] += $",{GetString($"Enter your \"{headers[i]}\" value > ", $"\"{headers[i]}\" value cannot be blank")}";
                 }
                 // Add to csv
-                File.WriteAllLines(file, fullFile);
+                File.WriteAllLines(filePath, fullFile);
 
                 Console.WriteLine("Entry added to Tickets.csv\n");
             } else {
                 Console.WriteLine("Tickets.csv does not exist!");
             }
+            */
         }
 
         static int GetInt(bool restrictValues, int intMin, int intMax, string prompt, string errorMsg) {

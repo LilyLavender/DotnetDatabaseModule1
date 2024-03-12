@@ -15,7 +15,7 @@ public class TicketFile {
             
             // Get details from file
             string[] ticketDetails = line.Split(',');
-            ticket.ticketId = UInt64.Parse(movieDetails[0]);
+            ticket.ticketId = UInt64.Parse(ticketDetails[0]);
             ticket.summary = ticketDetails[1];
             ticket.status = ticketDetails[2];
             ticket.priority = ticketDetails[3];

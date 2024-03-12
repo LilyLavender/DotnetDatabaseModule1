@@ -14,6 +14,6 @@ public class Ticket
     }
 
     public string Display() {
-        return $"{ticketId,-21}{summary,-21}{status,-21}{priority,-21}{submitter,-21}{assigned,-21}{string.Join(", ", watching),-21}\n";
+        return $"{ticketId,-21}{summary,-21}{status,-21}{priority,-21}{submitter,-21}{assigned,-21}{string.Join(", ", watching),-21}";
     }
 }

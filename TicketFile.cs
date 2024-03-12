@@ -4,7 +4,7 @@ public class TicketFile {
 
     // Constructor
     public TicketFile(string filePath) {
-        filePath = filePath;
+        this.filePath = filePath;
         Tickets = new List<Ticket>();
 
         StreamReader sr = new StreamReader(filePath);
@@ -32,7 +32,7 @@ public class TicketFile {
         // Generate ticket id
         ticket.ticketId = Tickets.Max(t => t.ticketId) + 1;
         StreamWriter sw = new StreamWriter(filePath, true);
-        sw.WriteLine($"{ticket.ticketId},{ticket.summary},{ticket.status},{ticket.priority},{ticket.submitter},{ticket.assigned},{string.Join("|", ticket.watching)}");
+        sw.Write($"\n{ticket.ticketId},{ticket.summary},{ticket.status},{ticket.priority},{ticket.submitter},{ticket.assigned},{string.Join("|", ticket.watching)}");
         sw.Close();
         // Add ticket to list
         Tickets.Add(ticket);

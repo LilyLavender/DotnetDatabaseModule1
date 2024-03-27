@@ -6,12 +6,12 @@ namespace SchallyLilyTicketingSystem
     {
         static void Main(string[] args)
         {
-            string filePath = "Tickets.csv";
-            if (!System.IO.File.Exists(filePath)) {
-                Console.WriteLine("Tickets.csv does not exist, please add a valid Tickets.csv first");
+            string[] filePaths = {"Tickets.csv", "Enhancements.csv", "Task.csv"};
+            if (filePaths.Any(fp => !System.IO.File.Exists(fp))) {
+                Console.WriteLine("Tickets.csv, Enhancements.csv, or Task.csv is missing!");
                 Environment.Exit(1);
             }
-            TicketFile ticketFile = new TicketFile(filePath);
+            TicketFile[] ticketFiles = {new TicketFile(filePaths[0]), new TicketFile(filePaths[1]), new TicketFile(filePaths[2])};
 
             while (true) {
                 Console.WriteLine("Type 1 to view csv");
@@ -19,55 +19,139 @@ namespace SchallyLilyTicketingSystem
                 Console.WriteLine("Type 0 to exit");
                 int option = GetInt(true, 0, 2, "", "Number must be one of the aforementioned values");
                 switch(option) {
-                    case 1:
-                        ViewCsv(filePath, ticketFile);
+                    case 1: // View CSV
+                        ViewCsv(ticketFiles);
                         break;
-                    case 2:
-                        AddToCsv(filePath, ticketFile);
+                    case 2: // Add to CSV
+                        while (true) {
+                            Console.WriteLine("Which type of ticket do you wish to add?");
+                            Console.WriteLine("Type 1 to add a bug/defect ticket");
+                            Console.WriteLine("Type 2 to add an enhancement ticket");
+                            Console.WriteLine("Type 3 to add a task ticket");
+                            Console.WriteLine("Type 0 to cancel");
+                            int option2 = GetInt(true, 0, 3, "", "Number must be one of the aforementioned values");
+                            if (option2 >= 1 && option2 <= 3) {
+                                AddToCsv(ticketFiles, option2);
+                            }
+                            break;
+                        }
                         break;
-                    default:
+                    default: // Exit
                         Environment.Exit(1);
                         break;
                 }
             }
         }
 
-        static void ViewCsv(string filePath, TicketFile ticketFile) {
-            // Print Headers
-            String[] headers = new String[7]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching"};
+        static void ViewCsv(TicketFile[] ticketFiles) {
+            // Print Bug Tickets
+            String[] headers = new String[8]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Severity"};
             foreach(String h in headers) {
                 Console.Write($"{h,-21}");
             }
             Console.Write("\n");
-            // Print data
-            foreach(Ticket t in ticketFile.Tickets) {
+            foreach(Ticket t in ticketFiles[0].Tickets) {
+                Console.WriteLine(t.Display());
+            }
+            // Print Enhancements
+            String[] headers2 = new String[11]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Software","Cost","Reason","Estimate"};
+            foreach(String h in headers2) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            foreach(Ticket t in ticketFiles[1].Tickets) {
+                Console.WriteLine(t.Display());
+            }
+            // Print Tasks
+            String[] headers3 = new String[9]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Project Name","Due Date"};
+            foreach(String h in headers3) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            foreach(Ticket t in ticketFiles[2].Tickets) {
                 Console.WriteLine(t.Display());
             }
         }
 
-        static void AddToCsv(string filePath, TicketFile ticketFile) {
+        static void AddToCsv(TicketFile[] ticketFiles, int csvType) {
             
-            Ticket ticket = new Ticket();
-            // Print questions for user
-            ticket.summary = GetString("Enter the ticket's summary > ", "Summary cannot be blank");
-            ticket.status = GetString("Enter the ticket's status > ", "Status cannot be blank");
-            ticket.priority = GetString("Enter the ticket's priority > ", "Priority cannot be blank");
-            ticket.submitter = GetString("Enter the ticket's submitter > ", "Submitter cannot be blank");
-            ticket.assigned = GetString("Enter who the ticket is for > ", "Assignee cannot be blank");
-            String input = "";
-            do {
-                input = GetString("Enter a watcher of the ticket, and \"done\" when done > ", "Watcher cannot be blank");
-                if (input != "done") {
-                    ticket.watching.Add(input);
+            if (csvType == 1) {
+                BugTicket ticket = new BugTicket();
+                // Print questions for user
+                ticket.summary = GetString("Enter the ticket's summary > ", "Summary cannot be blank");
+                ticket.status = GetString("Enter the ticket's status > ", "Status cannot be blank");
+                ticket.priority = GetString("Enter the ticket's priority > ", "Priority cannot be blank");
+                ticket.submitter = GetString("Enter the ticket's submitter > ", "Submitter cannot be blank");
+                ticket.assigned = GetString("Enter who the ticket is for > ", "Assignee cannot be blank");
+                String input = "";
+                do {
+                    input = GetString("Enter a watcher of the ticket, and \"done\" when done > ", "Watcher cannot be blank");
+                    if (input != "done") {
+                        ticket.watching.Add(input);
+                    }
+                } while (input != "done");
+                // No watchers
+                if (ticket.watching.Count == 0) {
+                    ticket.watching.Add("(no watchers)");
                 }
-            } while (input != "done");
-            // No watchers
-            if (ticket.watching.Count == 0) {
-                ticket.watching.Add("(no watchers)");
-            }
+                ticket.severity = GetString("Enter the ticket's severity > ", "Severity cannot be blank");            
 
-            // Add ticket
-            ticketFile.AddTicket(ticket);
+                // Add ticket
+                ticketFiles[csvType-1].AddBugTicket(ticket);
+
+            } else if (csvType == 2) {
+                Enhancement ticket = new Enhancement();
+                // Print questions for user
+                ticket.summary = GetString("Enter the ticket's summary > ", "Summary cannot be blank");
+                ticket.status = GetString("Enter the ticket's status > ", "Status cannot be blank");
+                ticket.priority = GetString("Enter the ticket's priority > ", "Priority cannot be blank");
+                ticket.submitter = GetString("Enter the ticket's submitter > ", "Submitter cannot be blank");
+                ticket.assigned = GetString("Enter who the ticket is for > ", "Assignee cannot be blank");
+                String input = "";
+                do {
+                    input = GetString("Enter a watcher of the ticket, and \"done\" when done > ", "Watcher cannot be blank");
+                    if (input != "done") {
+                        ticket.watching.Add(input);
+                    }
+                } while (input != "done");
+                // No watchers
+                if (ticket.watching.Count == 0) {
+                    ticket.watching.Add("(no watchers)");
+                }
+                ticket.software = GetString("Enter the ticket's software > ", "Software cannot be blank");
+                ticket.cost = GetString("Enter the ticket's cost > ", "Cost cannot be blank");
+                ticket.reason = GetString("Enter the ticket's reason > ", "Reason cannot be blank");
+                ticket.estimate = GetString("Enter the ticket's estimate > ", "Estimate cannot be blank");
+
+                // Add ticket
+                ticketFiles[csvType-1].AddEnhancement(ticket);
+
+            } else if (csvType == 3) {
+                Task ticket = new Task();
+                // Print questions for user
+                ticket.summary = GetString("Enter the ticket's summary > ", "Summary cannot be blank");
+                ticket.status = GetString("Enter the ticket's status > ", "Status cannot be blank");
+                ticket.priority = GetString("Enter the ticket's priority > ", "Priority cannot be blank");
+                ticket.submitter = GetString("Enter the ticket's submitter > ", "Submitter cannot be blank");
+                ticket.assigned = GetString("Enter who the ticket is for > ", "Assignee cannot be blank");
+                String input = "";
+                do {
+                    input = GetString("Enter a watcher of the ticket, and \"done\" when done > ", "Watcher cannot be blank");
+                    if (input != "done") {
+                        ticket.watching.Add(input);
+                    }
+                } while (input != "done");
+                // No watchers
+                if (ticket.watching.Count == 0) {
+                    ticket.watching.Add("(no watchers)");
+                }
+                ticket.projectName = GetString("Enter the ticket's Project Name > ", "Project Name cannot be blank");
+                ticket.dueDate = GetString("Enter the ticket's Due Date > ", "Due Date cannot be blank");
+
+                // Add ticket
+                ticketFiles[csvType-1].AddTask(ticket);
+
+            }
         }
 
         static int GetInt(bool restrictValues, int intMin, int intMax, string prompt, string errorMsg) {

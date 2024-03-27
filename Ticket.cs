@@ -1,4 +1,4 @@
-public class Ticket
+public abstract class Ticket
 {
     public UInt64 ticketId { get; set; }
     public string summary { get; set; }

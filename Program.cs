@@ -16,8 +16,9 @@ namespace SchallyLilyTicketingSystem
             while (true) {
                 Console.WriteLine("Type 1 to view csv");
                 Console.WriteLine("Type 2 to add to csv");
+                Console.WriteLine("Type 3 to search all csvs");
                 Console.WriteLine("Type 0 to exit");
-                int option = GetInt(true, 0, 2, "", "Number must be one of the aforementioned values");
+                int option = GetInt(true, 0, 3, "", "Number must be one of the aforementioned values");
                 switch(option) {
                     case 1: // View CSV
                         ViewCsv(ticketFiles);
@@ -35,6 +36,9 @@ namespace SchallyLilyTicketingSystem
                             }
                             break;
                         }
+                        break;
+                    case 3: // Search
+                        SearchCsv(ticketFiles);
                         break;
                     default: // Exit
                         Environment.Exit(1);
@@ -151,6 +155,84 @@ namespace SchallyLilyTicketingSystem
                 // Add ticket
                 ticketFiles[csvType-1].AddTask(ticket);
 
+            }
+        }
+        
+        static void SearchCsv(TicketFile[] ticketFiles) {
+            // Get search type from user
+            int searchType = 0;
+            while (true) {
+                Console.WriteLine("Type 1 to search based on status");
+                Console.WriteLine("Type 2 to search based on priority");
+                Console.WriteLine("Type 3 to search based on submitter");
+                Console.WriteLine("Type 0 to cancel");
+                searchType = GetInt(true, 0, 3, "", "Number must be one of the aforementioned values");
+                if (searchType >= 1 && searchType <= 3) {
+                    break;
+                }
+            }
+
+            // Get search term from user
+            string searchTerm = "";
+            while (true) {
+                Console.Write("Enter your search term: ");
+                searchTerm = GetString("", "Search term cannot be blank.").ToLower();
+                if (!String.IsNullOrEmpty(searchTerm)) {
+                    break;
+                }
+            }
+
+            var restrictedTickets = new[] {
+                ticketFiles[0].Tickets.Where(t => t.status.ToLower().Contains(searchTerm)),
+                ticketFiles[1].Tickets.Where(t => t.status.ToLower().Contains(searchTerm)),
+                ticketFiles[2].Tickets.Where(t => t.status.ToLower().Contains(searchTerm))
+            };
+            switch(searchType) {
+                case 2:
+                    restrictedTickets = new[] {
+                        ticketFiles[0].Tickets.Where(t => t.priority.ToLower().Contains(searchTerm)),
+                        ticketFiles[1].Tickets.Where(t => t.priority.ToLower().Contains(searchTerm)),
+                        ticketFiles[2].Tickets.Where(t => t.priority.ToLower().Contains(searchTerm))
+                    };
+                    break;
+                case 3:
+                    restrictedTickets = new[] {
+                        ticketFiles[0].Tickets.Where(t => t.submitter.ToLower().Contains(searchTerm)),
+                        ticketFiles[1].Tickets.Where(t => t.submitter.ToLower().Contains(searchTerm)),
+                        ticketFiles[2].Tickets.Where(t => t.submitter.ToLower().Contains(searchTerm))
+                    };
+                    break;
+                default:
+                    break;
+            }
+            Console.WriteLine($"Total tickets: {restrictedTickets[0].Count() + restrictedTickets[1].Count() + restrictedTickets[2].Count()}");
+
+            // Print Bug Tickets
+            String[] headers = new String[8]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Severity"};
+            foreach(String h in headers) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            foreach(Ticket t in restrictedTickets[0]) {
+                Console.WriteLine(t.Display());
+            }
+            // Print Enhancements
+            String[] headers2 = new String[11]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Software","Cost","Reason","Estimate"};
+            foreach(String h in headers2) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            foreach(Ticket t in restrictedTickets[1]) {
+                Console.WriteLine(t.Display());
+            }
+            // Print Tasks
+            String[] headers3 = new String[9]{"TicketID","Summary","Status","Priority","Submitter","Assigned","Watching","Project Name","Due Date"};
+            foreach(String h in headers3) {
+                Console.Write($"{h,-21}");
+            }
+            Console.Write("\n");
+            foreach(Ticket t in restrictedTickets[2]) {
+                Console.WriteLine(t.Display());
             }
         }
 
